@@ -1,0 +1,19 @@
+{
+    "name": "burrbd/blueprint-router-php",
+    "require": {
+        "php/php" : "^5.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "BlueprintRouter\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BlueprintRouter\\": "tests"
+        }
+    }
+}
