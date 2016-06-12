@@ -17,6 +17,15 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
         rewind($this->file);
     }
 
+    public function testInvalidArgument()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $scanner = new Scanner(new HashDelimitedHeadingParser());
+
+        $scanner->scan('foo');
+    }
+
     public function testScanADefinition()
     {
         $this->writeContents('# Foo [/foo]');
