@@ -26,6 +26,15 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
         $scanner->scan('foo');
     }
 
+    public function testParseInvalidDefinition()
+    {
+        $this->writeContents('# foo bar');
+
+        $scanner = new Scanner(new HashDelimitedHeadingParser());
+
+        $scanner->scan($this->file);
+    }
+
     public function testScanADefinition()
     {
         $this->writeContents('# Foo [/foo]');
