@@ -5,11 +5,12 @@ namespace BlueprintRouter;
 class HashDelimitedHeadingParser implements HeadingParser
 {
     /**
-     * @param $line
+     * @param string   $line
+     * @param resource $handle
      *
      * @return bool
      */
-    public function isHeading($line)
+    public function isHeading($line, $handle)
     {
         $line = trim($line);
 

@@ -20,38 +20,36 @@ class Scanner
     }
 
     /**
-     * @param resource $fileHandle
+     * @param resource $handle
      *
      * @return null
      */
-    public function scan($fileHandle)
+    public function scan($handle)
     {
-        if (!is_resource($fileHandle)) {
+        if (!is_resource($handle)) {
             throw new \InvalidArgumentException('Invalid argument');
         }
 
         $definitions = [];
 
-        if ($fileHandle) {
-            while (($line = fgets($fileHandle)) !== false) {
-                if ($this->headingParser->isHeading($line)) {
+        while (($line = fgets($handle)) !== false) {
+            if ($this->headingParser->isHeading($line, $handle)) {
 
-                    $level = $this->headingParser->headingLevel($line);
+                $level = $this->headingParser->headingLevel($line);
 
-                    $definition = $this->scanDefinition(
-                        $this->resolveParent($level),
-                        $this->headingParser->headingContents($line)
-                    );
+                $definition = $this->scanDefinition(
+                    $this->resolveParent($level),
+                    $this->headingParser->headingContents($line)
+                );
 
-                    if (null !== $definition) {
-                        $definitions[] = $definition;
-                        $this->scannedDefinitions[] = [$level, $definition];
-                    }
+                if (null !== $definition) {
+                    $definitions[] = $definition;
+                    $this->scannedDefinitions[] = [$level, $definition];
                 }
             }
-
-            fclose($fileHandle);
         }
+
+        fclose($handle);
 
         return $definitions;
     }

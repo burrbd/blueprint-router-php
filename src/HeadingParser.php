@@ -5,11 +5,12 @@ namespace BlueprintRouter;
 interface HeadingParser
 {
     /**
-     * @param string $line
+     * @param string   $line
+     * @param resource $handle
      *
      * @return bool
      */
-    public function isHeading($line);
+    public function isHeading($line, $handle);
 
     /**
      * @param string $line
