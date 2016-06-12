@@ -37,7 +37,7 @@ class Scanner
 
                 $level = $this->headingParser->headingLevel($line);
 
-                $definition = $this->scanDefinition(
+                $definition = $this->parseDefinition(
                     $this->resolveParent($level),
                     $this->headingParser->headingContents($line)
                 );
@@ -60,7 +60,7 @@ class Scanner
      *
      * @return Definition|null
      */
-    private function scanDefinition(Definition $parent = null, $text)
+    private function parseDefinition(Definition $parent = null, $text)
     {
         // # Group <identifier>
         preg_match('/^Group\s+([^\[\]\(\)]+)$/', $text, $matches);
@@ -133,9 +133,9 @@ class Scanner
      */
     private function resolveParent($level)
     {
-        for ($i = count($this->scannedDefinitions); $i >= 0; $i--) {
+        for ($i = count($this->scannedDefinitions) - 1; $i >= 0; $i--) {
             if ($level > $this->scannedDefinitions[$i][0]) {
-                return $this->scannedDefinitions[$i];
+                return $this->scannedDefinitions[$i][1];
             }
         }
 
