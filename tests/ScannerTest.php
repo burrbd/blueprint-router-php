@@ -82,4 +82,26 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(new Definition(null, 'Wiz bang', 'PATCH', '/pop'), $definitions[0]);
     }
+
+    public function testMethodTemplate()
+    {
+        $this->writeContents('## PUT ');
+
+        $scanner = new Scanner(new HashDelimitedHeadingParser());
+
+        $definitions = $scanner->scan($this->file);
+
+        $this->assertEquals(new Definition(null, null, 'PUT', null), $definitions[0]);
+    }
+
+    public function testIdentifierMethodTemplate()
+    {
+        $this->writeContents('## Bar foo [PUT] ');
+
+        $scanner = new Scanner(new HashDelimitedHeadingParser());
+
+        $definitions = $scanner->scan($this->file);
+
+        $this->assertEquals(new Definition(null, 'Bar foo', 'PUT', null), $definitions[0]);
+    }
 }

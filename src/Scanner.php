@@ -62,7 +62,7 @@ class Scanner
      */
     private function scanDefinition(Definition $parent = null, $text)
     {
-        // Group <identifier>
+        // # Group <identifier>
         preg_match('/^Group\s+([^\[\]\(\)]+)$/', $text, $matches);
         if (count($matches) === 2) {
             $identifier = $matches[1];
@@ -70,7 +70,7 @@ class Scanner
             return new Definition($parent, $identifier);
         }
 
-        // <URI template>
+        // # <URI template>
         preg_match('/(^\/\S+)$/', $text, $matches);
         if (count($matches) === 2) {
             $uriTemplate = $matches[0];
@@ -78,7 +78,7 @@ class Scanner
             return new Definition($parent, null, null, $uriTemplate);
         }
 
-        // <HTTP request method> <URI template>
+        // # <HTTP request method> <URI template>
         preg_match('/^(GET|PUT|POST|PATCH|DELETE)\s+(\/\S+)$/', $text, $matches);
         if (count($matches) === 3) {
             $method = $matches[1];
@@ -87,7 +87,7 @@ class Scanner
             return new Definition($parent, null, $method, $uriTemplate);
         }
 
-        // <identifier> [<URI template>]
+        // # <identifier> [<URI template>]
         preg_match('/^([^\[\]\(\)]+)\[(\/\S+)\]$/', $text, $matches);
         if (count($matches) === 3) {
             $uriTemplate = $matches[2];
@@ -96,7 +96,7 @@ class Scanner
             return new Definition($parent, $identifier, null, $uriTemplate);
         }
 
-        // <identifier> [<HTTP request method> <URI template>]
+        // # <identifier> [<HTTP request method> <URI template>]
         preg_match('/^([^\[\]\(\)]+)\[(GET|PUT|POST|PATCH|DELETE)\s+(\/\S+)\]$/', $text, $matches);
         if (count($matches) === 4) {
             $identifier = trim($matches[1]);
@@ -104,6 +104,23 @@ class Scanner
             $uriTemplate = $matches[3];
 
             return new Definition($parent, $identifier, $method, $uriTemplate);
+        }
+
+        // ## <HTTP request method>
+        preg_match('/^(GET|PUT|POST|PATCH|DELETE)$/', $text, $matches);
+        if (count($matches) === 2) {
+            $method = $matches[1];
+
+            return new Definition($parent, null, $method, null);
+        }
+
+        // ## <identifier> [<HTTP request method>]
+        preg_match('/^([^\[\]\(\)]+)\[(GET|PUT|POST|PATCH|DELETE)\]$/', $text, $matches);
+        if (count($matches) === 3) {
+            $identifier = trim($matches[1]);
+            $method = $matches[2];
+
+            return new Definition($parent, $identifier, $method, null);
         }
 
         return null;
