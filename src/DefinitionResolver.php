@@ -37,12 +37,15 @@ class DefinitionResolver
      */
     private function recurseAncestors(Definition $endpoint, Definition $ancestor = null)
     {
-        if (null === $ancestor || $endpoint->isValidEndpoint()) {
+        if (null === $ancestor) {
             return;
         }
 
-        if (null === $endpoint->identifier) {
-            $endpoint->identifier = $ancestor->identifier;
+        if (0 !== count($ancestor->identifier)) {
+            $ancestorIdentifiersReversed = array_reverse($ancestor->identifier);
+            foreach($ancestorIdentifiersReversed as $identifierItem) {
+                array_unshift($endpoint->identifier, $identifierItem);
+            }
         }
 
         if (null === $endpoint->method) {
@@ -53,9 +56,7 @@ class DefinitionResolver
             $endpoint->uriTemplate = $ancestor->uriTemplate;
         }
 
-        if (!$endpoint->isValidEndpoint()) {
-            $this->recurseAncestors($endpoint, $ancestor->parent);
-        }
+        $this->recurseAncestors($endpoint, $ancestor->parent);
 
         return;
     }

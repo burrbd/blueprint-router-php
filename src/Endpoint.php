@@ -6,10 +6,19 @@ use BlueprintRouter\Parser\Definition;
 
 class Endpoint
 {
+    /**
+     * @var array
+     */
     private $identifier;
 
+    /**
+     * @var string
+     */
     private $uriTemplate;
 
+    /**
+     * @var string
+     */
     private $method;
 
     /**

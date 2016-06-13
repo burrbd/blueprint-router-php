@@ -10,7 +10,7 @@ class Definition
     public $parent;
 
     /**
-     * @var string
+     * @var array
      */
     public $identifier;
 
@@ -26,11 +26,11 @@ class Definition
 
     /**
      * @param Definition $parent
-     * @param string     $identifier
+     * @param array      $identifier
      * @param string     $method
      * @param string     $uriTemplate
      */
-    public function __construct(Definition $parent = null, $identifier = null, $method = null, $uriTemplate = null)
+    public function __construct(Definition $parent = null, array $identifier = [], $method = null, $uriTemplate = null)
     {
         $this->parent = $parent;
         $this->identifier = $identifier;
@@ -40,7 +40,7 @@ class Definition
 
     public function isValidEndpoint()
     {
-        return null !== $this->identifier
+        return count($this->identifier) > 0
         && null !== $this->method
         && null !== $this->uriTemplate;
     }

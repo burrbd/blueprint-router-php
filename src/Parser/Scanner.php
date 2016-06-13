@@ -68,9 +68,9 @@ class Scanner
         // # Group <identifier>
         preg_match('/^Group\s+([^\[\]\(\)]+)$/', $text, $matches);
         if (count($matches) === 2) {
-            $identifier = $matches[1];
+            $identifier = trim($matches[1]);
 
-            return new Definition($parent, $identifier);
+            return new Definition($parent, [$identifier]);
         }
 
         // # <URI template>
@@ -78,7 +78,7 @@ class Scanner
         if (count($matches) === 2) {
             $uriTemplate = $matches[0];
 
-            return new Definition($parent, null, null, $uriTemplate);
+            return new Definition($parent, [], null, $uriTemplate);
         }
 
         // # <HTTP request method> <URI template>
@@ -87,7 +87,7 @@ class Scanner
             $method = $matches[1];
             $uriTemplate = $matches[2];
 
-            return new Definition($parent, null, $method, $uriTemplate);
+            return new Definition($parent, [], $method, $uriTemplate);
         }
 
         // # <identifier> [<URI template>]
@@ -96,7 +96,7 @@ class Scanner
             $uriTemplate = $matches[2];
             $identifier = trim($matches[1]);
 
-            return new Definition($parent, $identifier, null, $uriTemplate);
+            return new Definition($parent, [$identifier], null, $uriTemplate);
         }
 
         // # <identifier> [<HTTP request method> <URI template>]
@@ -106,7 +106,7 @@ class Scanner
             $method = $matches[2];
             $uriTemplate = $matches[3];
 
-            return new Definition($parent, $identifier, $method, $uriTemplate);
+            return new Definition($parent, [$identifier], $method, $uriTemplate);
         }
 
         // ## <HTTP request method>
@@ -114,7 +114,7 @@ class Scanner
         if (count($matches) === 2) {
             $method = $matches[1];
 
-            return new Definition($parent, null, $method, null);
+            return new Definition($parent, [], $method, null);
         }
 
         // ## <identifier> [<HTTP request method>]
@@ -123,7 +123,7 @@ class Scanner
             $identifier = trim($matches[1]);
             $method = $matches[2];
 
-            return new Definition($parent, $identifier, $method, null);
+            return new Definition($parent, [$identifier], $method, null);
         }
 
         return null;
