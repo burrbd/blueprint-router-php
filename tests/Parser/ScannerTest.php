@@ -1,6 +1,6 @@
 <?php
 
-namespace BlueprintRouter;
+namespace BlueprintRouter\Parser;
 
 class ScannerTest extends \PHPUnit_Framework_TestCase
 {

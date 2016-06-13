@@ -1,6 +1,6 @@
 <?php
 
-namespace BlueprintRouter;
+namespace BlueprintRouter\Parser;
 
 class HashDelimitedHeadingParser implements HeadingParser
 {

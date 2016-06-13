@@ -1,6 +1,6 @@
 <?php
 
-namespace BlueprintRouter;
+namespace BlueprintRouter\Parser;
 
 class Scanner
 {
@@ -10,10 +10,13 @@ class Scanner
     private $headingParser;
 
     /**
-     * @var []Definition
+     * @var Definition[]
      */
     private $scannedDefinitions;
 
+    /**
+     * @param HeadingParser $headingParser
+     */
     public function __construct(HeadingParser $headingParser)
     {
         $this->headingParser = $headingParser;

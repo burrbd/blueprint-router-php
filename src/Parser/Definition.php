@@ -1,6 +1,6 @@
 <?php
 
-namespace BlueprintRouter;
+namespace BlueprintRouter\Parser;
 
 class Definition
 {
@@ -36,5 +36,12 @@ class Definition
         $this->identifier = $identifier;
         $this->method = $method;
         $this->uriTemplate = $uriTemplate;
+    }
+
+    public function isValidEndpoint()
+    {
+        return null !== $this->identifier
+        && null !== $this->method
+        && null !== $this->uriTemplate;
     }
 }

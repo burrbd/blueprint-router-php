@@ -1,6 +1,6 @@
 <?php
 
-namespace BlueprintRouter;
+namespace BlueprintRouter\Parser;
 
 interface HeadingParser
 {
