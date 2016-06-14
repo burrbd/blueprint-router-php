@@ -10,11 +10,6 @@ class Scanner
     private $headingParser;
 
     /**
-     * @var Definition[]
-     */
-    private $scannedDefinitions;
-
-    /**
      * @param HeadingParser $headingParser
      */
     public function __construct(HeadingParser $headingParser)
@@ -38,39 +33,38 @@ class Scanner
         while (($line = fgets($handle)) !== false) {
             if ($this->headingParser->isHeading($line, $handle)) {
 
-                $level = $this->headingParser->headingLevel($line);
-
                 $definition = $this->parseDefinition(
-                    $this->resolveParent($level),
                     $this->headingParser->headingContents($line)
                 );
 
                 if (null !== $definition) {
-                    $definitions[] = $definition;
-                    $this->scannedDefinitions[] = [$level, $definition];
+                    $level = $this->headingParser->headingLevel($line);
+                    $definition->parent = $this->findParent($level, $definitions);
+                    $definitions[] = [$level, $definition];
                 }
+
+                // TODO: add parameters to definition
             }
         }
 
         fclose($handle);
 
-        return $definitions;
+        return array_map(function ($n) {return $n[1];}, $definitions);
     }
 
     /**
-     * @param Definition|null $parent
      * @param string          $text
      *
      * @return Definition|null
      */
-    private function parseDefinition(Definition $parent = null, $text)
+    private function parseDefinition($text)
     {
         // # Group <identifier>
         preg_match('/^Group\s+([^\[\]\(\)]+)$/', $text, $matches);
         if (count($matches) === 2) {
             $identifier = trim($matches[1]);
 
-            return new Definition($parent, [$identifier]);
+            return new Definition([$identifier]);
         }
 
         // # <URI template>
@@ -78,7 +72,7 @@ class Scanner
         if (count($matches) === 2) {
             $uriTemplate = $matches[0];
 
-            return new Definition($parent, [], null, $uriTemplate);
+            return new Definition([], null, $uriTemplate);
         }
 
         // # <HTTP request method> <URI template>
@@ -87,7 +81,7 @@ class Scanner
             $method = $matches[1];
             $uriTemplate = $matches[2];
 
-            return new Definition($parent, [], $method, $uriTemplate);
+            return new Definition([], $method, $uriTemplate);
         }
 
         // # <identifier> [<URI template>]
@@ -96,7 +90,7 @@ class Scanner
             $uriTemplate = $matches[2];
             $identifier = trim($matches[1]);
 
-            return new Definition($parent, [$identifier], null, $uriTemplate);
+            return new Definition([$identifier], null, $uriTemplate);
         }
 
         // # <identifier> [<HTTP request method> <URI template>]
@@ -106,7 +100,7 @@ class Scanner
             $method = $matches[2];
             $uriTemplate = $matches[3];
 
-            return new Definition($parent, [$identifier], $method, $uriTemplate);
+            return new Definition([$identifier], $method, $uriTemplate);
         }
 
         // ## <HTTP request method>
@@ -114,7 +108,7 @@ class Scanner
         if (count($matches) === 2) {
             $method = $matches[1];
 
-            return new Definition($parent, [], $method, null);
+            return new Definition([], $method);
         }
 
         // ## <identifier> [<HTTP request method>]
@@ -123,22 +117,23 @@ class Scanner
             $identifier = trim($matches[1]);
             $method = $matches[2];
 
-            return new Definition($parent, [$identifier], $method, null);
+            return new Definition([$identifier], $method);
         }
 
         return null;
     }
 
     /**
-     * @param int $level
+     * @param int          $level
+     * @param Definition[] $definitions
      *
      * @return Definition|null
      */
-    private function resolveParent($level)
+    private function findParent($level, array $definitions)
     {
-        for ($i = count($this->scannedDefinitions) - 1; $i >= 0; $i--) {
-            if ($level > $this->scannedDefinitions[$i][0]) {
-                return $this->scannedDefinitions[$i][1];
+        for ($i = count($definitions) - 1; $i >= 0; $i--) {
+            if ($level > $definitions[$i][0]) {
+                return $definitions[$i][1];
             }
         }
 

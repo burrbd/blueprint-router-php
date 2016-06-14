@@ -25,17 +25,17 @@ class Definition
     public $uriTemplate;
 
     /**
-     * @param Definition $parent
      * @param array      $identifier
      * @param string     $method
      * @param string     $uriTemplate
+     * @param Definition $parent
      */
-    public function __construct(Definition $parent = null, array $identifier = [], $method = null, $uriTemplate = null)
+    public function __construct(array $identifier = [], $method = null, $uriTemplate = null, Definition $parent = null)
     {
-        $this->parent = $parent;
         $this->identifier = $identifier;
         $this->method = $method;
         $this->uriTemplate = $uriTemplate;
+        $this->parent = $parent;
     }
 
     public function isValidEndpoint()

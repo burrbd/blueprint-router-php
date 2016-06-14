@@ -54,7 +54,7 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
 
         $definitions = $scanner->scan($this->file);
 
-        $this->assertEquals(new Definition(null, ['foo bar'], null, null), $definitions[0]);
+        $this->assertEquals(new Definition(['foo bar']), $definitions[0]);
     }
 
     public function testUriTemplate()
@@ -65,7 +65,7 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
 
         $definitions = $scanner->scan($this->file);
 
-        $this->assertEquals(new Definition(null, [], null, '/foo/{bar}'), $definitions[0]);
+        $this->assertEquals(new Definition([], null, '/foo/{bar}'), $definitions[0]);
     }
 
     public function testIdentifierUriTemplate()
@@ -76,7 +76,7 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
 
         $definitions = $scanner->scan($this->file);
 
-        $this->assertEquals(new Definition(null, ['Foo'], null, '/foo'), $definitions[0]);
+        $this->assertEquals(new Definition(['Foo'], null, '/foo'), $definitions[0]);
     }
 
     public function testMethodUriTemplate()
@@ -87,7 +87,7 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
 
         $definitions = $scanner->scan($this->file);
 
-        $this->assertEquals(new Definition(null, [], 'POST', '/foo'), $definitions[0]);
+        $this->assertEquals(new Definition([], 'POST', '/foo'), $definitions[0]);
     }
 
     public function testIdentifierMethodUriTemplate()
@@ -98,7 +98,7 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
 
         $definitions = $scanner->scan($this->file);
 
-        $this->assertEquals(new Definition(null, ['Whiz bang'], 'PATCH', '/pop'), $definitions[0]);
+        $this->assertEquals(new Definition(['Whiz bang'], 'PATCH', '/pop'), $definitions[0]);
     }
 
     public function testMethodTemplate()
@@ -109,7 +109,7 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
 
         $definitions = $scanner->scan($this->file);
 
-        $this->assertEquals(new Definition(null, [], 'PUT', null), $definitions[0]);
+        $this->assertEquals(new Definition([], 'PUT'), $definitions[0]);
     }
 
     public function testIdentifierMethodTemplate()
@@ -120,7 +120,7 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
 
         $definitions = $scanner->scan($this->file);
 
-        $this->assertEquals(new Definition(null, ['Bar foo'], 'PUT', null), $definitions[0]);
+        $this->assertEquals(new Definition(['Bar foo'], 'PUT'), $definitions[0]);
     }
 
     public function testMultiLevelNesting()
@@ -133,10 +133,10 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                new Definition(null, ['Foo bar'], null, null),
-                new Definition($definitions[0], [], null, '/foo/bar'),
-                new Definition($definitions[1], [], 'GET', null),
-                new Definition($definitions[1], [], 'PATCH', null)
+                new Definition(['Foo bar']),
+                new Definition([], null, '/foo/bar', $definitions[0]),
+                new Definition([], 'GET', null, $definitions[1]),
+                new Definition([], 'PATCH', null, $definitions[1])
             ],
             $definitions
         );
