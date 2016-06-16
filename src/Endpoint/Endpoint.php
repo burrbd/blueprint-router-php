@@ -1,8 +1,8 @@
 <?php
 
-namespace BlueprintRouter;
+namespace BlueprintRouter\Endpoint;
 
-use BlueprintRouter\Parser\Definition;
+use BlueprintRouter\Parser\DefinitionParser;
 
 class Endpoint
 {
@@ -26,8 +26,8 @@ class Endpoint
      */
     public function __construct(Definition $definition)
     {
-        $this->identifier = $definition->identifier;
-        $this->uriTemplate = $definition->uriTemplate;
-        $this->method = $definition->method;
+        $this->identifier = $definition->getIdentifiers();
+        $this->uriTemplate = $definition->getUriTemplate();
+        $this->method = $definition->getMethod();
     }
 }

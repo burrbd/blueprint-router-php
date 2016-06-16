@@ -2,19 +2,22 @@
 
 namespace BlueprintRouter\Parser;
 
+use BlueprintRouter\Endpoint\Definition;
+use BlueprintRouter\Parser\DefinitionParser\DefinitionParser;
+
 class Scanner
 {
     /**
-     * @var HeadingParser
+     * @var DefinitionParser[]
      */
-    private $headingParser;
+    private $definitionParsers;
 
     /**
-     * @param HeadingParser $headingParser
+     * @param DefinitionParser $definitionParser
      */
-    public function __construct(HeadingParser $headingParser)
+    public function addDefinitionParser(DefinitionParser $definitionParser)
     {
-        $this->headingParser = $headingParser;
+        $this->definitionParsers[] = $definitionParser;
     }
 
     /**
@@ -29,111 +32,59 @@ class Scanner
         }
 
         $definitions = [];
-
+        
         while (($line = fgets($handle)) !== false) {
-            if ($this->headingParser->isHeading($line, $handle)) {
 
-                $definition = $this->parseDefinition(
-                    $this->headingParser->headingContents($line)
-                );
+            $definition = $this->parseDefinition($line, $handle);
 
-                if (null !== $definition) {
-                    $level = $this->headingParser->headingLevel($line);
-                    $definition->parent = $this->findParent($level, $definitions);
-                    $definitions[] = [$level, $definition];
+            if (null !== $definition) {
+
+                $parent = $this->findParent($definition, $definitions);
+
+                if (null !== $parent) {
+                    $definition->setParent($parent);
                 }
 
-                // TODO: add parameters to definition
+                $definitions[] = $definition;
             }
         }
 
         fclose($handle);
-
-        return array_map(function ($n) {return $n[1];}, $definitions);
+        
+        return $definitions;
     }
 
     /**
-     * @param string          $text
+     * @param string $definitionText
+     * @param        $handle
      *
      * @return Definition|null
      */
-    private function parseDefinition($text)
+    private function parseDefinition($definitionText, $handle)
     {
-        // # Group <identifier>
-        preg_match('/^Group\s+([^\[\]\(\)]+)$/', $text, $matches);
-        if (count($matches) === 2) {
-            $identifier = trim($matches[1]);
+        foreach ($this->definitionParsers as $parser) {
 
-            return new Definition([$identifier]);
-        }
+            $definition = $parser->parseDefinition($definitionText, $handle);
 
-        // # <URI template>
-        preg_match('/(^\/\S+)$/', $text, $matches);
-        if (count($matches) === 2) {
-            $uriTemplate = $matches[0];
-
-            return new Definition([], null, $uriTemplate);
-        }
-
-        // # <HTTP request method> <URI template>
-        preg_match('/^(GET|PUT|POST|PATCH|DELETE)\s+(\/\S+)$/', $text, $matches);
-        if (count($matches) === 3) {
-            $method = $matches[1];
-            $uriTemplate = $matches[2];
-
-            return new Definition([], $method, $uriTemplate);
-        }
-
-        // # <identifier> [<URI template>]
-        preg_match('/^([^\[\]\(\)]+)\[(\/\S+)\]$/', $text, $matches);
-        if (count($matches) === 3) {
-            $uriTemplate = $matches[2];
-            $identifier = trim($matches[1]);
-
-            return new Definition([$identifier], null, $uriTemplate);
-        }
-
-        // # <identifier> [<HTTP request method> <URI template>]
-        preg_match('/^([^\[\]\(\)]+)\[(GET|PUT|POST|PATCH|DELETE)\s+(\/\S+)\]$/', $text, $matches);
-        if (count($matches) === 4) {
-            $identifier = trim($matches[1]);
-            $method = $matches[2];
-            $uriTemplate = $matches[3];
-
-            return new Definition([$identifier], $method, $uriTemplate);
-        }
-
-        // ## <HTTP request method>
-        preg_match('/^(GET|PUT|POST|PATCH|DELETE)$/', $text, $matches);
-        if (count($matches) === 2) {
-            $method = $matches[1];
-
-            return new Definition([], $method);
-        }
-
-        // ## <identifier> [<HTTP request method>]
-        preg_match('/^([^\[\]\(\)]+)\[(GET|PUT|POST|PATCH|DELETE)\]$/', $text, $matches);
-        if (count($matches) === 3) {
-            $identifier = trim($matches[1]);
-            $method = $matches[2];
-
-            return new Definition([$identifier], $method);
+            if ($definition) {
+                return $definition;
+            }
         }
 
         return null;
     }
 
     /**
-     * @param int          $level
+     * @param Definition   $definition
      * @param Definition[] $definitions
      *
      * @return Definition|null
      */
-    private function findParent($level, array $definitions)
+    private function findParent(Definition $definition, array $definitions)
     {
         for ($i = count($definitions) - 1; $i >= 0; $i--) {
-            if ($level > $definitions[$i][0]) {
-                return $definitions[$i][1];
+            if ($definition->getSectionLevel() > $definitions[$i]->getSectionLevel()) {
+                return $definitions[$i];
             }
         }
 

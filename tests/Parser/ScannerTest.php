@@ -2,12 +2,26 @@
 
 namespace BlueprintRouter\Parser;
 
+use BlueprintRouter\Endpoint\DefinitionFactory;
+use BlueprintRouter\Parser\DefinitionParser\HashDelimitedHeadingParser;
+use BlueprintRouter\Parser\DefinitionParser\Tokenizer\BasicDefinitionTokenizer;
+
 class ScannerTest extends \PHPUnit_Framework_TestCase
 {
+    use DefinitionFactory;
+
     private $file;
+
+    private $definitionParser;
+
+    private $scanner;
 
     public function setUp()
     {
+        $this->definitionParser = new HashDelimitedHeadingParser(new BasicDefinitionTokenizer());
+        $this->scanner = new Scanner();
+        $this->scanner->addDefinitionParser($this->definitionParser);
+
         $this->file = tmpfile();
     }
 
@@ -21,27 +35,23 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $scanner = new Scanner(new HashDelimitedHeadingParser());
-
-        $scanner->scan('foo');
+        $this->scanner->scan('foo');
     }
 
     public function testParseInvalidDefinition()
     {
         $this->writeContents('# foo bar');
 
-        $scanner = new Scanner(new HashDelimitedHeadingParser());
+        $definitions = $this->scanner->scan($this->file);
 
-        $scanner->scan($this->file);
+        $this->assertCount(0, $definitions);
     }
 
     public function testScanADefinition()
     {
         $this->writeContents('# Foo [/foo]');
 
-        $scanner = new Scanner(new HashDelimitedHeadingParser());
-
-        $definitions = $scanner->scan($this->file);
+        $definitions = $this->scanner->scan($this->file);
 
         $this->assertCount(1, $definitions);
     }
@@ -50,95 +60,76 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
     {
         $this->writeContents('## Group foo bar ');
 
-        $scanner = new Scanner(new HashDelimitedHeadingParser());
+        $definitions = $this->scanner->scan($this->file);
 
-        $definitions = $scanner->scan($this->file);
-
-        $this->assertEquals(new Definition(['foo bar']), $definitions[0]);
+        $this->assertEquals([$this->createDefinition(null, 2, ['foo bar'])], $definitions);
     }
 
     public function testUriTemplate()
     {
         $this->writeContents('### /foo/{bar}');
 
-        $scanner = new Scanner(new HashDelimitedHeadingParser());
+        $definitions = $this->scanner->scan($this->file);
 
-        $definitions = $scanner->scan($this->file);
-
-        $this->assertEquals(new Definition([], null, '/foo/{bar}'), $definitions[0]);
+        $this->assertEquals([$this->createDefinition(null, 3, [], null, '/foo/{bar}')], $definitions);
     }
 
     public function testIdentifierUriTemplate()
     {
         $this->writeContents('# Foo  [/foo] ');
 
-        $scanner = new Scanner(new HashDelimitedHeadingParser());
+        $definitions = $this->scanner->scan($this->file);
 
-        $definitions = $scanner->scan($this->file);
-
-        $this->assertEquals(new Definition(['Foo'], null, '/foo'), $definitions[0]);
+        $this->assertEquals([$this->createDefinition(null, 1, ['Foo'], null, '/foo')], $definitions);
     }
 
     public function testMethodUriTemplate()
     {
         $this->writeContents('## POST  /foo ');
 
-        $scanner = new Scanner(new HashDelimitedHeadingParser());
+        $definitions = $this->scanner->scan($this->file);
 
-        $definitions = $scanner->scan($this->file);
-
-        $this->assertEquals(new Definition([], 'POST', '/foo'), $definitions[0]);
+        $this->assertEquals([$this->createDefinition(null, 2, [], 'POST', '/foo')], $definitions);
     }
 
     public function testIdentifierMethodUriTemplate()
     {
         $this->writeContents('### Whiz bang [PATCH /pop] ');
 
-        $scanner = new Scanner(new HashDelimitedHeadingParser());
+        $definitions = $this->scanner->scan($this->file);
 
-        $definitions = $scanner->scan($this->file);
-
-        $this->assertEquals(new Definition(['Whiz bang'], 'PATCH', '/pop'), $definitions[0]);
+        $this->assertEquals([$this->createDefinition(null, 3, ['Whiz bang'], 'PATCH', '/pop')], $definitions);
     }
 
     public function testMethodTemplate()
     {
         $this->writeContents('## PUT ');
 
-        $scanner = new Scanner(new HashDelimitedHeadingParser());
+        $definitions = $this->scanner->scan($this->file);
 
-        $definitions = $scanner->scan($this->file);
-
-        $this->assertEquals(new Definition([], 'PUT'), $definitions[0]);
+        $this->assertEquals([$this->createDefinition(null, 2, [], 'PUT')], $definitions);
     }
 
     public function testIdentifierMethodTemplate()
     {
         $this->writeContents('## Bar foo [PUT] ');
 
-        $scanner = new Scanner(new HashDelimitedHeadingParser());
+        $definitions = $this->scanner->scan($this->file);
 
-        $definitions = $scanner->scan($this->file);
-
-        $this->assertEquals(new Definition(['Bar foo'], 'PUT'), $definitions[0]);
+        $this->assertEquals([$this->createDefinition(null, 2, ['Bar foo'], 'PUT')], $definitions);
     }
 
     public function testMultiLevelNesting()
     {
         $this->writeContents('# Group Foo bar'."\n".'## /foo/bar'."\n".'### GET'."\n".'### PATCH');
 
-        $scanner = new Scanner(new HashDelimitedHeadingParser());
+        $definitions = $this->scanner->scan($this->file);
 
-        $definitions = $scanner->scan($this->file);
+        $d1 = $this->createDefinition(null, 1, ['Foo bar']);
+        $d2 = $this->createDefinition($d1, 2, [], null, '/foo/bar');
+        $d3 = $this->createDefinition($d2, 3, [], 'GET');
+        $d4 = $this->createDefinition($d2, 3, [], 'PATCH');
 
-        $this->assertEquals(
-            [
-                new Definition(['Foo bar']),
-                new Definition([], null, '/foo/bar', $definitions[0]),
-                new Definition([], 'GET', null, $definitions[1]),
-                new Definition([], 'PATCH', null, $definitions[1])
-            ],
-            $definitions
-        );
+        $this->assertEquals([$d1, $d2, $d3, $d4], $definitions);
     }
 }

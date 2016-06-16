@@ -1,8 +1,6 @@
 <?php
 
-namespace BlueprintRouter;
-
-use BlueprintRouter\Parser\Definition;
+namespace BlueprintRouter\Endpoint;
 
 class DefinitionResolver
 {
@@ -19,7 +17,7 @@ class DefinitionResolver
 
             $endpoint = clone $definition;
 
-            $this->recurseAncestors($endpoint, $endpoint->parent);
+            $this->recurseAncestors($endpoint, $endpoint->getParent());
 
             if ($endpoint->isValidEndpoint()) {
                 $endpoints[] = new Endpoint($endpoint);
@@ -41,23 +39,21 @@ class DefinitionResolver
             return;
         }
 
-        if (0 !== count($ancestor->identifier)) {
-            $ancestorIdentifiersReversed = array_reverse($ancestor->identifier);
+        if (0 !== count($ancestor->getIdentifiers())) {
+            $ancestorIdentifiersReversed = array_reverse($ancestor->getIdentifiers());
             foreach($ancestorIdentifiersReversed as $identifierItem) {
-                array_unshift($endpoint->identifier, $identifierItem);
+                $endpoint->prependIdentifier($identifierItem);
             }
         }
 
-        if (null === $endpoint->method) {
-            $endpoint->method = $ancestor->method;
+        if (null === $endpoint->getMethod()) {
+            $endpoint->setMethod($ancestor->getMethod());
         }
 
-        if (null === $endpoint->uriTemplate) {
-            $endpoint->uriTemplate = $ancestor->uriTemplate;
+        if (null === $endpoint->getUriTemplate()) {
+            $endpoint->setUriTemplate($ancestor->getUriTemplate());
         }
 
-        $this->recurseAncestors($endpoint, $ancestor->parent);
-
-        return;
+        $this->recurseAncestors($endpoint, $ancestor->getParent());
     }
 }
