@@ -21,23 +21,6 @@ class AtxHeaderDefinedSection implements DefinitionParser
     }
 
     /**
-     * @param string   $line
-     *
-     * @return int
-     */
-    private function sectionLevel($line)
-    {
-        $line = trim($line);
-
-        $i = 0;
-        while ($line[$i] === '#') {
-            $i++;
-        }
-
-        return $i;
-    }
-
-    /**
      * @param string   $content
      * @param resource $handle
      *
@@ -52,6 +35,7 @@ class AtxHeaderDefinedSection implements DefinitionParser
         }
 
         $level = $this->sectionLevel($content);
+
         $content = trim(substr($content, $level));
 
         $definition = $this->definitionMatcher->match($content);
@@ -61,5 +45,20 @@ class AtxHeaderDefinedSection implements DefinitionParser
         }
 
         return $definition;
+    }
+
+    /**
+     * @param string   $line
+     *
+     * @return int
+     */
+    private function sectionLevel($line)
+    {
+        $i = 0;
+        while ($line[$i] === '#') {
+            $i++;
+        }
+
+        return $i;
     }
 }
