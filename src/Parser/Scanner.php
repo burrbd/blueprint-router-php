@@ -3,19 +3,19 @@
 namespace BlueprintRouter\Parser;
 
 use BlueprintRouter\Endpoint\Definition;
-use BlueprintRouter\Parser\DefinitionParser\DefinitionParser;
+use BlueprintRouter\Parser\SectionParser\SectionParser;
 
 class Scanner
 {
     /**
-     * @var DefinitionParser[]
+     * @var SectionParser[]
      */
     private $definitionParsers;
 
     /**
-     * @param DefinitionParser $definitionParser
+     * @param SectionParser $definitionParser
      */
-    public function addDefinitionParser(DefinitionParser $definitionParser)
+    public function addDefinitionParser(SectionParser $definitionParser)
     {
         $this->definitionParsers[] = $definitionParser;
     }

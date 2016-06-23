@@ -3,8 +3,8 @@
 namespace BlueprintRouter\Parser;
 
 use BlueprintRouter\Endpoint\DefinitionFactory;
-use BlueprintRouter\Parser\DefinitionParser\AtxHeaderDefinedSection;
-use BlueprintRouter\Parser\DefinitionParser\DefinitionMatcher\StandardDefinitionMatcher;
+use BlueprintRouter\Parser\SectionParser\AtxHeaderDefinedSection;
+use BlueprintRouter\Parser\SectionParser\DefinitionMatcher\StandardDefinitionMatcher;
 
 class ScannerTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace BlueprintRouter\Parser\DefinitionParser;
+namespace BlueprintRouter\Parser\SectionParser;
 
-interface DefinitionParser
+interface SectionParser
 {
     /**
      * @param string   $content

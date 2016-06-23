@@ -1,6 +1,6 @@
 <?php
 
-namespace BlueprintRouter\Parser\DefinitionParser\DefinitionMatcher;
+namespace BlueprintRouter\Parser\SectionParser\DefinitionMatcher;
 
 use BlueprintRouter\Endpoint\Definition;
 

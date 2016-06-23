@@ -1,11 +1,11 @@
 <?php
 
-namespace BlueprintRouter\Parser\DefinitionParser;
+namespace BlueprintRouter\Parser\SectionParser;
 
 use BlueprintRouter\Endpoint\Definition;
-use BlueprintRouter\Parser\DefinitionParser\DefinitionMatcher\SectionDefinitionMatcher;
+use BlueprintRouter\Parser\SectionParser\DefinitionMatcher\SectionDefinitionMatcher;
 
-class SetexHeaderDefinedSection implements DefinitionParser
+class SetexHeaderDefinedSection implements SectionParser
 {
     /**
      * @var SectionDefinitionMatcher

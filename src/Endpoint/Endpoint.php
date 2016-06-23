@@ -2,7 +2,7 @@
 
 namespace BlueprintRouter\Endpoint;
 
-use BlueprintRouter\Parser\DefinitionParser;
+use BlueprintRouter\Parser\SectionParser;
 
 class Endpoint
 {
