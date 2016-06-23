@@ -1,17 +1,17 @@
 <?php
 
-namespace BlueprintRouter\Parser\DefinitionParser\Tokenizer;
+namespace BlueprintRouter\Parser\DefinitionParser\DefinitionMatcher;
 
 use BlueprintRouter\Endpoint\Definition;
 
-class BasicDefinitionTokenizer implements DefinitionTokenizer
+class StandardDefinitionMatcher implements SectionDefinitionMatcher
 {
     /**
      * @param string $content
      *
      * @return Definition|null
      */
-    public function tokenizeDefinition($content)
+    public function match($content)
     {
         $definition = new Definition();
 

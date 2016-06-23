@@ -3,8 +3,8 @@
 namespace BlueprintRouter\Parser;
 
 use BlueprintRouter\Endpoint\DefinitionFactory;
-use BlueprintRouter\Parser\DefinitionParser\HashDelimitedHeadingParser;
-use BlueprintRouter\Parser\DefinitionParser\Tokenizer\BasicDefinitionTokenizer;
+use BlueprintRouter\Parser\DefinitionParser\AtxHeaderDefinedSection;
+use BlueprintRouter\Parser\DefinitionParser\DefinitionMatcher\StandardDefinitionMatcher;
 
 class ScannerTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,7 +18,7 @@ class ScannerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->definitionParser = new HashDelimitedHeadingParser(new BasicDefinitionTokenizer());
+        $this->definitionParser = new AtxHeaderDefinedSection(new StandardDefinitionMatcher());
         $this->scanner = new Scanner();
         $this->scanner->addDefinitionParser($this->definitionParser);
 

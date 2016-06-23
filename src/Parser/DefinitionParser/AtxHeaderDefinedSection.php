@@ -3,21 +3,21 @@
 namespace BlueprintRouter\Parser\DefinitionParser;
 
 use BlueprintRouter\Endpoint\Definition;
-use BlueprintRouter\Parser\DefinitionParser\Tokenizer\DefinitionTokenizer;
+use BlueprintRouter\Parser\DefinitionParser\DefinitionMatcher\SectionDefinitionMatcher;
 
-class HashDelimitedHeadingParser implements DefinitionParser
+class AtxHeaderDefinedSection implements DefinitionParser
 {
     /**
-     * @var DefinitionTokenizer
+     * @var SectionDefinitionMatcher
      */
-    private $definitionTokenizer;
+    private $definitionMatcher;
 
     /**
-     * @param DefinitionTokenizer $definitionTokenizer
+     * @param SectionDefinitionMatcher $definitionMatcher
      */
-    public function __construct(DefinitionTokenizer $definitionTokenizer)
+    public function __construct(SectionDefinitionMatcher $definitionMatcher)
     {
-        $this->definitionTokenizer = $definitionTokenizer;
+        $this->definitionMatcher = $definitionMatcher;
     }
 
     /**
@@ -54,7 +54,7 @@ class HashDelimitedHeadingParser implements DefinitionParser
         $level = $this->sectionLevel($content);
         $content = trim(substr($content, $level));
 
-        $definition = $this->definitionTokenizer->tokenizeDefinition($content);
+        $definition = $this->definitionMatcher->match($content);
 
         if (null !== $definition) {
             $definition->setSectionLevel($level);
